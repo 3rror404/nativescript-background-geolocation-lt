@@ -157,7 +157,9 @@ export class MapModel extends observable.Observable {
     if (this._enabled !== value) {
       this._enabled = value;
       if (value) {
-        BackgroundGeolocation.start();
+        BackgroundGeolocation.start(function() {
+          console.log('STARTED');
+        });
 
         // Reload cached positions from plugin
         var polyline = this._getPolyline();
@@ -175,6 +177,12 @@ export class MapModel extends observable.Observable {
       } else {
         BackgroundGeolocation.stop();
         BackgroundGeolocation.resetOdometer();
+
+        BackgroundGeolocation.sync(function(locations) {
+          console.log('Sync SUCCESS');
+        }.bind(this), function(errorMessage) {
+            console.warn('Sync FAILURE: ', errorMessage);
+        }.bind(this));
 
         // Remove Map markers & shapes
         this._geofenceMarkers = {};
@@ -295,7 +303,10 @@ export class MapModel extends observable.Observable {
       // Fetch default config with overrides.
       config = SettingsViewModel.getDefaultConfig({
         license: "5647026b5a15ced50fcd3adcb2b743ab32abf2374c40d0aff875e53b15f93b60",
-        url: 'http://192.168.11.100:8080/locations',
+        url: '',
+        autoSync: false,
+        batchSync: true,
+        maxBatchSize: -1,
         params: {
           device: {
             platform: Platform.device.os,

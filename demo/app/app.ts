@@ -28,7 +28,7 @@ if (application.ios) {
 
 ////
 // For debugging
-//application.start({ moduleName: "./pages/login/login" });
+application.start({ moduleName: "./pages/login/login" });
 
-application.start({ moduleName: "./pages/map/map-page" });
+//application.start({ moduleName: "./pages/map/map-page" });
 

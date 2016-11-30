@@ -220,12 +220,6 @@ export class MapModel extends observable.Observable {
         });
 
 
-        // BackgroundGeolocation.sync(function(locations) {
-        //   console.log('Sync SUCCESS');
-        // }.bind(this), function(errorMessage) {
-        //     console.warn('Sync FAILURE: ', errorMessage);
-        // }.bind(this));
-
         // Remove Map markers & shapes
         this._geofenceMarkers = {};
         this.activityType = "off";

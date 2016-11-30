@@ -157,8 +157,23 @@ export class MapModel extends observable.Observable {
     if (this._enabled !== value) {
       this._enabled = value;
       if (value) {
-        BackgroundGeolocation.start(function() {
-          console.log('STARTED');
+
+        var config = {
+            extras: {
+                journeyID: 111,
+                vehicleID: 456
+            },
+            stopOnTerminate: false,
+            isMoving: true
+        };
+
+        BackgroundGeolocation.setConfig(config, function() {
+            BackgroundGeolocation.start(function() {
+                console.log('STARTED');
+                //this.startDurationTimer(false);
+            }.bind(this));
+        }.bind(this), function(err) { 
+          console.log('setConfig error: ' + err);
         });
 
         // Reload cached positions from plugin
@@ -175,14 +190,41 @@ export class MapModel extends observable.Observable {
           this.set('zoom', this._defaultZoom);
         }
       } else {
-        BackgroundGeolocation.stop();
-        BackgroundGeolocation.resetOdometer();
+        //BackgroundGeolocation.stop();
+        //BackgroundGeolocation.resetOdometer();
 
-        BackgroundGeolocation.sync(function(locations) {
-          console.log('Sync SUCCESS');
-        }.bind(this), function(errorMessage) {
-            console.warn('Sync FAILURE: ', errorMessage);
-        }.bind(this));
+
+        BackgroundGeolocation.stop(function() {
+            console.log('STOPPED');
+
+            var config = {
+                  //url: appConfig.apiUrl + 'journeyevent_v2/?token=' + Settings.getString("token"),
+                  stopOnTerminate: true
+              };
+
+              BackgroundGeolocation.setConfig(config, function() {
+                  console.log('setConfig SUCCESS');
+
+                  BackgroundGeolocation.sync(function(locations) {
+                      console.log("sync SUCCESS");
+                  }.bind(this), function(errorMessage) {
+                      console.warn('Sync FAILURE: ', errorMessage);
+                  }.bind(this));
+
+              }.bind(this), function(err) {
+                  console.log('setConfig error: ', err);
+              }); // setConfig()
+            
+        }.bind(this), function() {
+            console.log('STOP FAILED');
+        });
+
+
+        // BackgroundGeolocation.sync(function(locations) {
+        //   console.log('Sync SUCCESS');
+        // }.bind(this), function(errorMessage) {
+        //     console.warn('Sync FAILURE: ', errorMessage);
+        // }.bind(this));
 
         // Remove Map markers & shapes
         this._geofenceMarkers = {};
